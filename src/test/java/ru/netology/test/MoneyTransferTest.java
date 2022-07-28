@@ -1,6 +1,7 @@
 package ru.netology.test;
 
 import com.codeborne.selenide.Configuration;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.netology.data.DataHelper;
 import ru.netology.page.DashboardPage;
@@ -12,16 +13,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MoneyTransferTest {
 
-    private final String firstCardNumber = "5559 0000 0000 0001";
-    private final String secondCardNumber = "5559 0000 0000 0002";
+    @BeforeEach
+    void setUp() {
+        Configuration.headless = true;
+        Configuration.browserSize = "1280x720";
+        open("http://localhost:9999");
+    }
+
 
     @Test
     void shouldTransferMoneyAndCheckBalanceChanges() {
-        int amountToAdd = 1000;
-
-        open("http://localhost:9999");
-        Configuration.headless = true;
-        Configuration.browserSize = "1280x720";
+        int amountToTransfer = 1000;
 
         var loginPage = new LoginPage();
         var authInfo = DataHelper.getAuthInfo();
@@ -33,22 +35,19 @@ public class MoneyTransferTest {
         int preTransactionBalance2 = dashboardPage.getCardBalance(dashboardPage.getSecondCardID());
         dashboardPage.transferToFirstCardFromSecond();
         var transferPage = new TransferPage();
-        transferPage.transfer(String.valueOf(amountToAdd), secondCardNumber);
+        transferPage.transfer(String.valueOf(amountToTransfer), DataHelper.getCardInfo().getSecondCardNumber());
 
         int postTransactionBalance = dashboardPage.getCardBalance(dashboardPage.getFirstCardID());
         int postTransactionBalance2 = dashboardPage.getCardBalance(dashboardPage.getSecondCardID());
 
 
-        assertEquals(preTransactionBalance + amountToAdd, postTransactionBalance);
-        assertEquals(preTransactionBalance2 - amountToAdd, postTransactionBalance2);
+        assertEquals(preTransactionBalance + amountToTransfer, postTransactionBalance);
+        assertEquals(preTransactionBalance2 - amountToTransfer, postTransactionBalance2);
 
     }
 
     @Test
     void shouldNotTransferMoneyIfAmountOfMoneyToTransferIsHigherThanCardBalance() {
-        open("http://localhost:9999");
-        Configuration.headless = true;
-        Configuration.browserSize = "1280x720";
 
         var loginPage = new LoginPage();
         var authInfo = DataHelper.getAuthInfo();
@@ -63,7 +62,7 @@ public class MoneyTransferTest {
 
         int amountToTransfer = preTransactionBalance2 + 1;
 
-        transferPage.transfer(String.valueOf(amountToTransfer), secondCardNumber);
+        transferPage.transfer(String.valueOf(amountToTransfer), DataHelper.getCardInfo().getSecondCardNumber());
 
         int postTransactionBalance = dashboardPage.getCardBalance(dashboardPage.getFirstCardID());
         int postTransactionBalance2 = dashboardPage.getCardBalance(dashboardPage.getSecondCardID());
