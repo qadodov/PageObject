@@ -27,18 +27,20 @@ public class MoneyTransferTest {
 
         var loginPage = new LoginPage();
         var authInfo = DataHelper.getAuthInfo();
+        var firstCardInfo = DataHelper.getCardInfo();
+        var secondCardInfo = DataHelper.getOtherCardInfo();
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         verificationPage.validVerify(verificationCode);
         var dashboardPage = new DashboardPage();
-        int preTransactionBalance = dashboardPage.getCardBalance(dashboardPage.getFirstCardID());
-        int preTransactionBalance2 = dashboardPage.getCardBalance(dashboardPage.getSecondCardID());
+        int preTransactionBalance = dashboardPage.getCardBalance(firstCardInfo.getTestID());
+        int preTransactionBalance2 = dashboardPage.getCardBalance(secondCardInfo.getTestID());
         dashboardPage.transferToFirstCardFromSecond();
         var transferPage = new TransferPage();
-        transferPage.transfer(String.valueOf(amountToTransfer), DataHelper.getCardInfo().getSecondCardNumber());
+        transferPage.transfer(String.valueOf(amountToTransfer), secondCardInfo.getCardNumber());
 
-        int postTransactionBalance = dashboardPage.getCardBalance(dashboardPage.getFirstCardID());
-        int postTransactionBalance2 = dashboardPage.getCardBalance(dashboardPage.getSecondCardID());
+        int postTransactionBalance = dashboardPage.getCardBalance(firstCardInfo.getTestID());
+        int postTransactionBalance2 = dashboardPage.getCardBalance(secondCardInfo.getTestID());
 
 
         assertEquals(preTransactionBalance + amountToTransfer, postTransactionBalance);
@@ -51,22 +53,27 @@ public class MoneyTransferTest {
 
         var loginPage = new LoginPage();
         var authInfo = DataHelper.getAuthInfo();
+        var firstCardInfo = DataHelper.getCardInfo();
+        var secondCardInfo = DataHelper.getOtherCardInfo();
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         verificationPage.validVerify(verificationCode);
         var dashboardPage = new DashboardPage();
-        int preTransactionBalance = dashboardPage.getCardBalance(dashboardPage.getFirstCardID());
-        int preTransactionBalance2 = dashboardPage.getCardBalance(dashboardPage.getSecondCardID());
+        int preTransactionBalance = dashboardPage.getCardBalance(firstCardInfo.getTestID());
+        int preTransactionBalance2 = dashboardPage.getCardBalance(secondCardInfo.getTestID());
         dashboardPage.transferToFirstCardFromSecond();
         var transferPage = new TransferPage();
 
-        int amountToTransfer = preTransactionBalance2 + 1;
+        int amountToTransfer = preTransactionBalance2 + 1000;
 
-        transferPage.transfer(String.valueOf(amountToTransfer), DataHelper.getCardInfo().getSecondCardNumber());
+        transferPage.transfer(String.valueOf(amountToTransfer), secondCardInfo.getCardNumber());
 
-        int postTransactionBalance = dashboardPage.getCardBalance(dashboardPage.getFirstCardID());
-        int postTransactionBalance2 = dashboardPage.getCardBalance(dashboardPage.getSecondCardID());
+        transferPage.transferError();
 
-        assertEquals(-1, postTransactionBalance2);
+        int postTransactionBalance = dashboardPage.getCardBalance(firstCardInfo.getTestID());
+        int postTransactionBalance2 = dashboardPage.getCardBalance(secondCardInfo.getTestID());
+
+        assertEquals(preTransactionBalance, postTransactionBalance);
+        assertEquals(preTransactionBalance2, postTransactionBalance2);
     }
 }

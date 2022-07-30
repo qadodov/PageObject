@@ -8,19 +8,19 @@ import lombok.val;
 import static com.codeborne.selenide.Selenide.$$;
 import static com.codeborne.selenide.Selenide.$x;
 
-public final class DashboardPage {
+public class DashboardPage {
 
     private final SelenideElement heading = $x("//*[@data-test-id=\"dashboard\"]");
 
-    private final ElementsCollection cards = $$(".list__item div");
+    private ElementsCollection cards = $$(".list__item div");
 
     private final ElementsCollection transferButtons = $$(".list__item button");
 
     private final String balanceStart = "баланс: ";
     private final String balanceFinish = " р.";
 
-    private final String firstCardID = cards.first().getAttribute("data-test-id");
-    private final String secondCardID = cards.last().getAttribute("data-test-id");
+    private String firstCardID = cards.first().getAttribute("data-test-id");
+    private String secondCardID = cards.last().getAttribute("data-test-id");
     public DashboardPage() {
         heading.shouldBe(Condition.visible);
     }
@@ -35,14 +35,6 @@ public final class DashboardPage {
         var finish = text.indexOf(balanceFinish);
         var value = text.substring(start + balanceStart.length(), finish);
         return Integer.parseInt(value);
-    }
-
-    public String getFirstCardID() {
-        return this.firstCardID;
-    }
-
-    public String getSecondCardID() {
-        return this.secondCardID;
     }
 
     public TransferPage transferToFirstCardFromSecond() {
